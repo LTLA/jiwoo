@@ -162,7 +162,7 @@ Typical use case</h1>
 <div class="line">    <span class="keyword">const</span> std::size_t num_output = output_buffers.size();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Check out https://github.com/LTLA/subpar for parallelization details.</span></div>
-<div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> num_threads_used = subpar::parallelize_simple(</div>
+<div class="line">    subpar::parallelize_simple(</div>
 <div class="line">        num_threads,</div>
 <div class="line">        [&amp;](<span class="keyword">const</span> <span class="keywordtype">int</span> thread) -&gt; <span class="keywordtype">void</span> {</div>
 <div class="line">            std::optional&lt;std::vector&lt;double*&gt; &gt; tmp_output;</div>
@@ -188,13 +188,15 @@ Typical use case</h1>
 <div class="line">        }</div>
 <div class="line">    );</div>
 <div class="line"> </div>
-<div class="line">    <span class="keywordflow">if</span> (num_threads &gt; 1) {</div>
-<div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> u = 1; u &lt; num_threads_used; ++u) {</div>
-<div class="line">            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; partial_used = *((*partial_output)[u]);</div>
-<div class="line">            <span class="keywordflow">for</span> (std::size_t o = 0; o &lt; num_output; ++o) {</div>
-<div class="line">                <span class="keyword">auto</span> cur_output = output_buffers[o];</div>
-<div class="line">                <span class="keyword">auto</span> cur_partial = partial_used[o];</div>
-<div class="line">                <span class="comment">// Combine the partial results and store them in &#39;cur_output&#39;.</span></div>
+<div class="line">    <span class="comment">// Combine the partial results from all threads &gt; 0.</span></div>
+<div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> u = 1; u &lt; num_threads; ++u) {</div>
+<div class="line">        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; partial_used = *((*partial_output)[u]);</div>
+<div class="line">        <span class="keywordflow">for</span> (std::size_t o = 0; o &lt; num_output; ++o) {</div>
+<div class="line">            <span class="keyword">auto</span> cur_output = output_buffers[o];</div>
+<div class="line">            <span class="keyword">auto</span> cur_partial = partial_used[o];</div>
+<div class="line">            <span class="keywordflow">for</span> (std::size_t k = 0; k &lt; output_length; ++k) {</div>
+<div class="line">                <span class="comment">// Add combining logic here, for example:</span></div>
+<div class="line">                cur_output[k] += cur_partial[k];</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">    }</div>
