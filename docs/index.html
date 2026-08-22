@@ -147,7 +147,7 @@ Typical use case</h1>
 <li>Accepts a collection of pointers in its function signature, used to store the output.</li>
 <li>Is parallelized in a manner that each thread needs its own copy of the output buffers. For example, each thread computes a part of each output statistic, which is combined into the final output value in the subsequent serial section.</li>
 </ul>
-<p>A toy example of such a function is shown below. Some more concrete examples can be found in <a href="https://github.com/tatami-inc/tatami_stats/tree/master/include/tatami_stats/group_rss.hpp"><code>tatami_stats::group_rss()</code></a> and <a href="https://github.com/libscran/scran_aggregate/tree/master/include/scran_aggregate/aggregate_across_cells.hpp"><code>scran_aggregate::aggregate_across_cells()</code></a></p>
+<p>A toy example of such a function is shown below. Some more concrete examples can be found in <a href="https://github.com/tatami-inc/tatami_stats/tree/master/include/tatami_stats/group_rss.hpp"><code>tatami_stats::group_rss()</code></a> and <a href="https://github.com/libscran/scran_aggregate/tree/master/include/scran_aggregate/aggregate_across_cells.hpp"><code>scran_aggregate::aggregate_across_cells()</code></a>.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> compute_statistic(</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">int</span> num_threads,</div>
 <div class="line">    <span class="keyword">const</span> std::size_t output_length,</div>
