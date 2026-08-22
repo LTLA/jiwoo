@@ -92,9 +92,7 @@ $(function(){ initResizable(false); });
 <p><img src="https://github.com/LTLA/jiwoo/actions/workflows/run-tests.yaml/badge.svg" alt="Unit tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/LTLA/jiwoo/actions/workflows/doxygenate.yaml/badge.svg" alt="Documentation" style="pointer-events: none;" class="inline"/> <a href="https://codecov.io/gh/LTLA/jiwoo"><img src="https://codecov.io/gh/LTLA/jiwoo/branch/master/graph/badge.svg?token=b6PCRpDFzn" alt="Codecov" style="pointer-events: none;" class="inline"/></a></p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Background</h1>
-<p>Despite its generalist-sounding title, <b>jiwoo</b> is actually just designed for a very specific use case</p><ul>
-<li>managing a thread-specific allocation to store partial results in a parallelized function that accepts a vector of array pointers from the caller. It's a bit too complicated to actually demonstrate, so check out libraries like <a href="https://github.com/tatami-inc/tatami_stats"><b>tatami_stats</b></a> or <a href="https://github.com/libscran/scran_aggregate"><b>scran_aggregate</b></a> for examples of actual usage.</li>
-</ul>
+<p>Despite its generalist-sounding title, <b>jiwoo</b> is actually just designed for a very specific use case - managing a thread-specific allocation to store partial results in a parallelized function that accepts a vector of array pointers from the caller. It's a bit too complicated to actually demonstrate, so check out libraries like <a href="https://github.com/tatami-inc/tatami_stats"><b>tatami_stats</b></a> or <a href="https://github.com/libscran/scran_aggregate"><b>scran_aggregate</b></a> for examples of actual usage.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Quick start</h1>
 <p>The <code>Scope</code> class will automatically free any non-<code>NULL</code> array pointers inside its bound object when it is itself destroyed:</p>
