@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>jiwoo: Main Page</title>
+<title>jiwoo: Automatic memory management of containers of array pointers</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -17,6 +17,7 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -84,10 +85,107 @@ $(function(){ initResizable(false); });
 </div>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">jiwoo Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">Automatic memory management of containers of array pointers </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md__2github_2workspace_2README"></a></p>
+<p><img src="https://github.com/LTLA/jiwoo/actions/workflows/run-tests.yaml/badge.svg" alt="Unit tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/LTLA/jiwoo/actions/workflows/doxygenate.yaml/badge.svg" alt="Documentation" style="pointer-events: none;" class="inline"/> <a href="https://codecov.io/gh/LTLA/jiwoo"><img src="https://codecov.io/gh/LTLA/jiwoo/branch/master/graph/badge.svg?token=b6PCRpDFzn" alt="Codecov" style="pointer-events: none;" class="inline"/></a></p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Background</h1>
+<p>Despite its generalist-sounding title, <b>jiwoo</b> is actually just designed for a very specific use case - managing a thread-specific allocation to store partial results in a parallelized function that accepts a vector of array pointers from the caller. It's a bit too complicated to actually demonstrate, so check out libraries like <a href="https://github.com/tatami-inc/tatami_stats"><b>tatami_stats</b></a> or <a href="https://github.com/libscran/scran_aggregate"><b>scran_aggregate</b></a> for examples of actual usage.</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Quick start</h1>
+<p>The <code>Scope</code> class will automatically free any non-<code>NULL</code> array pointers inside its bound object when it is itself destroyed:</p>
+<div class="fragment"><div class="line">{</div>
+<div class="line">    std::vector&lt;double*&gt; ptrs;</div>
+<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> scope(ptrs); <span class="comment">// bind Scope to &#39;ptrs&#39;</span></div>
+<div class="line"> </div>
+<div class="line">    ptrs.push_back(<span class="keyword">new</span> <span class="keywordtype">double</span>[123]);</div>
+<div class="line">    ptrs.push_back(<span class="keyword">new</span> <span class="keywordtype">double</span>[32]);</div>
+<div class="line">    ptrs.push_back(NULL); <span class="comment">// ignored</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Scope will find all allocated array pointers and delete[] them.</span></div>
+<div class="line">}</div>
+<div class="ttc" id="aclassjiwoo_1_1Scope_html"><div class="ttname"><a href="classjiwoo_1_1Scope.html">jiwoo::Scope</a></div><div class="ttdoc">Scope for freeing a container of array pointers.</div><div class="ttdef"><b>Definition</b> jiwoo.hpp:29</div></div>
+</div><!-- fragment --><p>This works for any pointers that are stored in any nested combinations of <code>std::vector</code> and <code>std::optional</code>:</p>
+<div class="fragment"><div class="line">{</div>
+<div class="line">    std::optional&lt;std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; ptrs;</div>
+<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> scope(ptrs);</div>
+<div class="line"> </div>
+<div class="line">    ptrs.emplace(2);</div>
+<div class="line">    ptrs-&gt;back().emplace(5);</div>
+<div class="line">    ptrs-&gt;back()-&gt;front() = <span class="keyword">new</span> <span class="keywordtype">double</span> [59];</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Again, Scope will find the pointer and delete[] it. </span></div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Sometimes it is necessary to transfer pointers between containers bound to different <code>Scope</code> instances:</p>
+<div class="fragment"><div class="line">{</div>
+<div class="line">    std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; outer_ptrs(1);</div>
+<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> outer_scope(outer_ptrs);</div>
+<div class="line"> </div>
+<div class="line">    {</div>
+<div class="line">        std::optional&lt;std::vector&lt;double*&gt; &gt; inner_ptrs;</div>
+<div class="line">        <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> inner_scope(inner_ptrs);</div>
+<div class="line"> </div>
+<div class="line">        inner_ptrs.emplace(2);</div>
+<div class="line">        inner_ptrs-&gt;front() = <span class="keyword">new</span> <span class="keywordtype">double</span> [59];</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Newly allocated pointer will not be deleted here...</span></div>
+<div class="line">        <a class="code hl_function" href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer</a>(inner_ptrs, outer_ptrs[0]);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// But instead be transfered into outer_ptrs, where it will</span></div>
+<div class="line">    <span class="comment">// eventually be deleted here.</span></div>
+<div class="line">}</div>
+<div class="ttc" id="anamespacejiwoo_html_af906475cab6c5a715278963ec4ef7584"><div class="ttname"><a href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer</a></div><div class="ttdeci">void transfer(Container_ &amp;from, Container_ &amp;to)</div><div class="ttdef"><b>Definition</b> jiwoo.hpp:161</div></div>
+</div><!-- fragment --><p>Check out the <a href="https://ltla.github.io/jiwoo">reference documentation</a> for more details.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Building projects</h1>
+<h2><a class="anchor" id="autotoc_md4"></a>
+CMake with <code>FetchContent</code></h2>
+<p>If you're using CMake, you just need to add something like this to your <code>CMakeLists.txt</code>:</p>
+<div class="fragment"><div class="line">include(FetchContent)</div>
+<div class="line"> </div>
+<div class="line">FetchContent_Declare(</div>
+<div class="line">  jiwoo</div>
+<div class="line">  GIT_REPOSITORY https://github.com/LTLA/jiwoo</div>
+<div class="line">  GIT_TAG master # or any version of interest </div>
+<div class="line">)</div>
+<div class="line"> </div>
+<div class="line">FetchContent_MakeAvailable(jiwoo)</div>
+</div><!-- fragment --><p>Then you can link to <b>jiwoo</b> to make the headers available during compilation:</p>
+<div class="fragment"><div class="line"># For executables:</div>
+<div class="line">target_link_libraries(myexe jiwoo)</div>
+<div class="line"> </div>
+<div class="line"># For libaries</div>
+<div class="line">target_link_libraries(mylib INTERFACE jiwoo)</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md5"></a>
+CMake with <code>find_package()</code></h2>
+<p>You can install the library by cloning a suitable version of this repository and running the following commands:</p>
+<div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DJIWOO_TESTS=OFF</div>
+<div class="line">cmake --build . --target install</div>
+</div><!-- fragment --><p>Then you can use <code>find_package()</code> as usual:</p>
+<div class="fragment"><div class="line">find_package(ltla_jiwoo CONFIG REQUIRED)</div>
+<div class="line">target_link_libraries(mylib INTERFACE ltla::jiwoo)</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
+Manual</h2>
+<p>If you're not using CMake, the simple approach is to just copy the files in the <code>include/</code> subdirectory - either directly or with Git submodules - and include their path during compilation with, e.g., GCC's <code>-I</code>.</p>
+<h1><a class="anchor" id="autotoc_md7"></a>
+Origin of the name</h1>
+<p>This library is named after the main character of a K-drama that I imagined in the shower. The title of the K-drama is 잘 익은 자두의 향기, "Scent of a ripe plum".</p>
+<blockquote class="doxtable">
+<p>&zwj;<b>Synopsis:</b> Ji-Woo never believed in love. After her parents divorced in her teens, she devoted herself to study and work, steadily climbing the corporate ladder until she became a vice-president of a major company. Now approaching her forties, she watches on from the sidelines as her friends and family experiences the highs and loves of their romantic lives. However, when a handsome young graduate joins her team, youthful passions begin to stir in her heart. Has spingtime finally come for Ji-Woo? </p>
+</blockquote>
+<p>The show has three main arcs.</p>
+<ul>
+<li>The first arc deals with Ji-Woo overcoming the mental scars of her parents' divorce and learning to love again. The twist here is that the divorce was merely a ruse; Ji-Woo's mother came from old money and her father disapproved of the marriage to Ji-Woo's father. When her mother began to succumb to a terminal illness, they pretended to divorce to ensure that Ji-Woo would be supported by her wealthy grandparents.</li>
+<li>The second arc deals with Ji-Woo's ongoing relationship with the graduate. Here we introduce some new characters, namely a young female intern who is also attracted to the graduate. Now Ji-Woo has to manage a complex web of relationships within her team, managing both her lover and her competition.</li>
+<li>The third and final arc is something to do with marriage, I haven't thought too much about it yet.</li>
+</ul>
+<p>Anyway, I don't have the time to flesh this out into a screenplay and also I need to learn Korean. A reference to this idea in this library is the best we're going to get for now. </p>
+</div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -32,8 +32,9 @@
     </member>
   </compound>
   <compound kind="page">
-    <name>md__2github_2workspace_2README</name>
+    <name>index</name>
     <title>Automatic memory management of containers of array pointers</title>
-    <filename>md__2github_2workspace_2README.html</filename>
+    <filename>index.html</filename>
+    <docanchor file="index.html" title="Automatic memory management of containers of array pointers">md__2github_2workspace_2README</docanchor>
   </compound>
 </tagfile>
