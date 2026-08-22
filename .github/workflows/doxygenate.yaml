@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - master
+
+name: Build documentation
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Add Pretty CSS
+      run: curl -L https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css -o docs/doxygen-awesome.css 
+
+    - name: Doxygen Action
+      uses: mattnotmitt/doxygen-action@v1
+      with:
+        working-directory: docs/
+
+    - name: GH Pages Deployment
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: docs/html
+        target-folder: docs/
+        clean: true # Automatically remove deleted files from the deploy branch
