@@ -151,7 +151,7 @@ Typical use case</h1>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> compute_statistic(</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">int</span> num_threads,</div>
 <div class="line">    <span class="keyword">const</span> std::size_t output_length,</div>
-<div class="line">    std::vector&lt;double*&gt;&amp; output_buffers <span class="comment">// each pointer refers to an array of &#39;output_length&#39;</span></div>
+<div class="line">    std::vector&lt;double*&gt;&amp; output_buffers <span class="comment">// pointers to arrays of &#39;output_length&#39;</span></div>
 <div class="line">) {</div>
 <div class="line">    std::optional&lt;std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; &gt; partial_output;</div>
 <div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> outer_scope(partial_output);</div>
