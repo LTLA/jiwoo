@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['scope_0',['Scope',['../classjiwoo_1_1Scope.html',1,'jiwoo::Scope&lt; Container_ &gt;'],['../classjiwoo_1_1Scope.html#a99c124e322d46043e023c0ffa5492160',1,'jiwoo::Scope::Scope()']]]
+  ['background_0',['Background',['../md__2github_2workspace_2README.html#autotoc_md1',1,'']]],
+  ['building_20projects_1',['Building projects',['../md__2github_2workspace_2README.html#autotoc_md3',1,'']]]
 ];

@@ -31,4 +31,9 @@
       <arglist>(Container_ &amp;from, Container_ &amp;to)</arglist>
     </member>
   </compound>
+  <compound kind="page">
+    <name>md__2github_2workspace_2README</name>
+    <title>Automatic memory management of containers of array pointers</title>
+    <filename>md__2github_2workspace_2README.html</filename>
+  </compound>
 </tagfile>
