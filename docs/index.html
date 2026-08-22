@@ -201,7 +201,7 @@ Typical use case</h1>
 <div class="line">}</div>
 </div><!-- fragment --><p>The use of <b>jiwoo</b> here is motivated by several considerations:</p>
 <ol type="1">
-<li>The toy function writes directly to <code>output_buffers</code> in the first thread. This optimization avoids an unnecessary allocation of <code>tmp_output</code>, particularly during serial execution.</li>
+<li>The toy function writes directly to <code>output_buffers</code> in the first thread. This optimization avoids an unnecessary allocation of temporary output buffers, particularly during serial execution.</li>
 <li>Normally, if we wanted to allocate temporary output buffers, we would create a <code>std::vector&lt;std::vector&lt;double&gt; &gt;</code> that automatically manages the memory. However, if we want to easily switch between <code>output_buffers</code> and our temporary buffers in different threads, our temporary output buffers must also be represented as a <code>std::vector&lt;double*&gt;</code>.</li>
 <li>It would be slightly inefficient to allocate both a <code>std::vector&lt;std::vector&lt;double&gt; &gt;</code> and also a <code>std::vector&lt;double*&gt;</code> with pointers to each vector's data. So, we create a <code>std::vector&lt;double*&gt;</code> only, and fill it with pointers to arrays allocated with <code>new[]</code>. This is directly interchangeable with <code>output_buffers</code> but requires <b>jiwoo</b> to correctly free the arrays at the end of the function.</li>
 </ol>
