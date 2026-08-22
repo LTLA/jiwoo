@@ -8,8 +8,7 @@
 
 Despite its generalist-sounding title, **jiwoo** is actually just designed for a very specific use case -
 managing a thread-specific allocation to store partial results in a parallelized function that accepts a vector of array pointers from the caller.
-It's a bit too complicated to actually demonstrate, so check out libraries like [**tatami_stats**](https://github.com/tatami-inc/tatami_stats)
-or [**scran_aggregate**](https://github.com/libscran/scran_aggregate) for examples of actual usage.
+This is more involved than one might expect when we try to squeeze out some more performance by avoiding unnecessary allocations.
 
 ## Quick start
 
@@ -68,6 +67,90 @@ Sometimes it is necessary to transfer pointers between containers bound to diffe
 
 Check out the [reference documentation](https://ltla.github.io/jiwoo) for more details.
 
+## Typical use case
+
+**jiwoo** is primarily intended for use in a function that:
+
+- Accepts a collection of pointers in its function signature, used to store the output.
+- Is parallelized in a manner that each thread needs its own copy of the output buffers.
+  For example, each thread computes a part of each output statistic, which is combined into the final output value in the subsequent serial section.
+
+A toy example of such a function is shown below.
+Some more concrete examples can be found in [`tatami_stats::group_rss()`](https://github.com/tatami-inc/tatami_stats/tree/master/include/tatami_stats/group_rss.hpp)
+and [`scran_aggregate::aggregate_across_cells()`](https://github.com/libscran/scran_aggregate/tree/master/include/scran_aggregate/aggregate_across_cells.hpp).
+
+```cpp
+void compute_statistic(
+    const int num_threads,
+    const std::size_t output_length,
+    std::vector<double*>& output_buffers // pointers to arrays of 'output_length'
+) {
+    std::optional<std::vector<std::optional<std::vector<double*> > > > partial_output;
+    jiwoo::Scope outer_scope(partial_output);
+    if (num_threads > 1) {
+        partial_output.emplace(num_threads - 1);
+    }
+
+    const std::size_t num_output = output_buffers.size();
+
+    // Check out https://github.com/LTLA/subpar for parallelization details.
+    subpar::parallelize_simple(
+        num_threads,
+        [&](const int thread) -> void {
+            std::optional<std::vector<double*> > tmp_output;
+            jiwoo::Scope inner_scope(tmp_output);
+
+            std::vector<double*>* outptrs;
+            if (thread == 0) {
+                outptrs = &output_buffers;
+            } else {
+                tmp_output.emplace(num_output);
+                for (auto& ptr : *tmp_output) {
+                    ptr = new double[output_length];
+                }
+                outptrs = &(*tmp_output);
+            }
+
+            // Here we compute some kind of statistic within each thread,
+            // storing the result in the arrays referenced by entries of '*outptrs'. 
+
+            if (thread > 0) {
+                jiwoo::transfer(tmp_output, partial_output[thread - 1]);
+            }
+        }
+    );
+
+    // Combine the partial results from all threads > 0.
+    for (int u = 1; u < num_threads; ++u) {
+        const auto& partial_used = *((*partial_output)[u]);
+        for (std::size_t o = 0; o < num_output; ++o) {
+            auto cur_output = output_buffers[o];
+            auto cur_partial = partial_used[o];
+            for (std::size_t k = 0; k < output_length; ++k) {
+                // Add combining logic here, for example:
+                cur_output[k] += cur_partial[k];
+            }
+        }
+    }
+}
+```
+
+The use of **jiwoo** here is motivated by several considerations:
+
+1. The toy function writes directly to `output_buffers` in the first thread.
+   This optimization avoids an unnecessary allocation of temporary output buffers, particularly during serial execution.
+2. Normally, if we wanted to allocate temporary output buffers, we would create a `std::vector<std::vector<double> >` that automatically manages the memory. 
+   However, if we want to easily switch between `output_buffers` and our temporary buffers in different threads,
+   our temporary output buffers must also be represented as a `std::vector<double*>`.
+3. It would be slightly inefficient to allocate both a `std::vector<std::vector<double> >` and also a `std::vector<double*>` with pointers to each vector's data.
+   So, we create a `std::vector<double*>` only, and fill it with pointers to arrays allocated with `new[]`.
+   This is directly interchangeable with `output_buffers` but requires **jiwoo** to correctly free the arrays at the end of the function.
+
+Specifically, we use two sets of `jiwoo::Scope` instances here.
+The `inner_scope` is created inside each thread and ensures that there is no memory leak if the thread throws an exception.
+On success, each thread's vector of pointers is transferred (via `jiwoo::transfer()`) to a `partial_output` container outside of the thread's scope.
+This allows the function to combine the results from each thread to the final output value in the serial section.
+`partial_output` is under the control of a function-wide `outer_scope`, which frees all arrays from all threads before the function returns.
 
 ## Building projects 
 
