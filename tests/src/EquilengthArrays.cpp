@@ -68,8 +68,12 @@ TEST(EquilengthArrays, CopyAssignment) {
     }
 
     // Self allocation has no effect.
+    // Note that a little song and dance is required to prevent compilers from detecting a self-assignment
+    // (and generating a warning).
     {
-        ref = ref;
+        const auto addr = &ref;
+        auto masked = reinterpret_cast<void*>(addr);
+        ref = *reinterpret_cast<jiwoo::EquilengthArrays<double>*>(masked);
         for (int i = 0; i < 11; ++i) {
             for (int j = 0; j < 5; ++j) {
                 EXPECT_EQ(ref[i][j], i + j);
