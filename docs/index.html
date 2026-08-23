@@ -99,7 +99,7 @@ Quick start</h1>
 <p>The <code>Scope</code> class will automatically free any non-<code>NULL</code> array pointers inside its bound object when it is itself destroyed:</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    std::vector&lt;double*&gt; ptrs;</div>
-<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> scope(ptrs); <span class="comment">// bind Scope to &#39;ptrs&#39;</span></div>
+<div class="line">    jiwoo::Scope scope(ptrs); <span class="comment">// bind Scope to &#39;ptrs&#39;</span></div>
 <div class="line"> </div>
 <div class="line">    ptrs.push_back(<span class="keyword">new</span> <span class="keywordtype">double</span>[123]);</div>
 <div class="line">    ptrs.push_back(<span class="keyword">new</span> <span class="keywordtype">double</span>[32]);</div>
@@ -107,11 +107,10 @@ Quick start</h1>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Scope will find all allocated array pointers and delete[] them.</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aclassjiwoo_1_1Scope_html"><div class="ttname"><a href="classjiwoo_1_1Scope.html">jiwoo::Scope</a></div><div class="ttdoc">Scope for freeing a container of array pointers.</div><div class="ttdef"><b>Definition</b> jiwoo.hpp:29</div></div>
 </div><!-- fragment --><p>This works for any pointers that are stored in any nested combinations of <code>std::vector</code> and <code>std::optional</code>:</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    std::optional&lt;std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; ptrs;</div>
-<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> scope(ptrs);</div>
+<div class="line">    jiwoo::Scope scope(ptrs);</div>
 <div class="line"> </div>
 <div class="line">    ptrs.emplace(2);</div>
 <div class="line">    ptrs-&gt;back().emplace(5);</div>
@@ -122,23 +121,22 @@ Quick start</h1>
 </div><!-- fragment --><p>Sometimes it is necessary to transfer pointers between containers bound to different <code>Scope</code> instances:</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; outer_ptrs(1);</div>
-<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> outer_scope(outer_ptrs);</div>
+<div class="line">    jiwoo::Scope outer_scope(outer_ptrs);</div>
 <div class="line"> </div>
 <div class="line">    {</div>
 <div class="line">        std::optional&lt;std::vector&lt;double*&gt; &gt; inner_ptrs;</div>
-<div class="line">        <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> inner_scope(inner_ptrs);</div>
+<div class="line">        jiwoo::Scope inner_scope(inner_ptrs);</div>
 <div class="line"> </div>
 <div class="line">        inner_ptrs.emplace(2);</div>
 <div class="line">        inner_ptrs-&gt;front() = <span class="keyword">new</span> <span class="keywordtype">double</span> [59];</div>
 <div class="line"> </div>
 <div class="line">        <span class="comment">// Newly allocated pointer will not be deleted here...</span></div>
-<div class="line">        <a class="code hl_function" href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer</a>(inner_ptrs, outer_ptrs[0]);</div>
+<div class="line">        jiwoo::transfer(inner_ptrs, outer_ptrs[0]);</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// But instead be transfered into outer_ptrs, where it will</span></div>
 <div class="line">    <span class="comment">// eventually be deleted here.</span></div>
 <div class="line">}</div>
-<div class="ttc" id="anamespacejiwoo_html_af906475cab6c5a715278963ec4ef7584"><div class="ttname"><a href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer</a></div><div class="ttdeci">void transfer(Container_ &amp;from, Container_ &amp;to)</div><div class="ttdef"><b>Definition</b> jiwoo.hpp:161</div></div>
 </div><!-- fragment --><p>Check out the <a href="https://ltla.github.io/jiwoo">reference documentation</a> for more details.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Typical use case</h1>
@@ -154,7 +152,7 @@ Typical use case</h1>
 <div class="line">    std::vector&lt;double*&gt;&amp; output_buffers <span class="comment">// pointers to arrays of &#39;output_length&#39;</span></div>
 <div class="line">) {</div>
 <div class="line">    std::optional&lt;std::vector&lt;std::optional&lt;std::vector&lt;double*&gt; &gt; &gt; &gt; partial_output;</div>
-<div class="line">    <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> outer_scope(partial_output);</div>
+<div class="line">    jiwoo::Scope outer_scope(partial_output);</div>
 <div class="line">    <span class="keywordflow">if</span> (num_threads &gt; 1) {</div>
 <div class="line">        partial_output.emplace(num_threads - 1);</div>
 <div class="line">    }</div>
@@ -166,7 +164,7 @@ Typical use case</h1>
 <div class="line">        num_threads,</div>
 <div class="line">        [&amp;](<span class="keyword">const</span> <span class="keywordtype">int</span> thread) -&gt; <span class="keywordtype">void</span> {</div>
 <div class="line">            std::optional&lt;std::vector&lt;double*&gt; &gt; tmp_output;</div>
-<div class="line">            <a class="code hl_class" href="classjiwoo_1_1Scope.html">jiwoo::Scope</a> inner_scope(tmp_output);</div>
+<div class="line">            jiwoo::Scope inner_scope(tmp_output);</div>
 <div class="line"> </div>
 <div class="line">            std::vector&lt;double*&gt;* outptrs;</div>
 <div class="line">            <span class="keywordflow">if</span> (thread == 0) {</div>
@@ -183,7 +181,7 @@ Typical use case</h1>
 <div class="line">            <span class="comment">// storing the result in the arrays referenced by entries of &#39;*outptrs&#39;. </span></div>
 <div class="line"> </div>
 <div class="line">            <span class="keywordflow">if</span> (thread &gt; 0) {</div>
-<div class="line">                <a class="code hl_function" href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer</a>(tmp_output, partial_output[thread - 1]);</div>
+<div class="line">                jiwoo::transfer(tmp_output, partial_output[thread - 1]);</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">    );</div>
@@ -207,7 +205,7 @@ Typical use case</h1>
 <li>Normally, if we wanted to allocate temporary output buffers, we would create a <code>std::vector&lt;std::vector&lt;double&gt; &gt;</code> that automatically manages the memory. However, if we want to easily switch between <code>output_buffers</code> and our temporary buffers in different threads, our temporary output buffers must also be represented as a <code>std::vector&lt;double*&gt;</code>.</li>
 <li>It would be slightly inefficient to allocate both a <code>std::vector&lt;std::vector&lt;double&gt; &gt;</code> and also a <code>std::vector&lt;double*&gt;</code> with pointers to each vector's data. So, we create a <code>std::vector&lt;double*&gt;</code> only, and fill it with pointers to arrays allocated with <code>new[]</code>. This is directly interchangeable with <code>output_buffers</code> but requires <b>jiwoo</b> to correctly free the arrays at the end of the function.</li>
 </ol>
-<p>Specifically, we use two sets of <code><a class="el" href="classjiwoo_1_1Scope.html" title="Scope for freeing a container of array pointers.">jiwoo::Scope</a></code> instances here. The <code>inner_scope</code> is created inside each thread and ensures that there is no memory leak if the thread throws an exception. On success, each thread's vector of pointers is transferred (via <code><a class="el" href="namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584">jiwoo::transfer()</a></code>) to a <code>partial_output</code> container outside of the thread's scope. This allows the function to combine the results from each thread to the final output value in the serial section. <code>partial_output</code> is under the control of a function-wide <code>outer_scope</code>, which frees all arrays from all threads before the function returns.</p>
+<p>Specifically, we use two sets of <code>jiwoo::Scope</code> instances here. The <code>inner_scope</code> is created inside each thread and ensures that there is no memory leak if the thread throws an exception. On success, each thread's vector of pointers is transferred (via <code>jiwoo::transfer()</code>) to a <code>partial_output</code> container outside of the thread's scope. This allows the function to combine the results from each thread to the final output value in the serial section. <code>partial_output</code> is under the control of a function-wide <code>outer_scope</code>, which frees all arrays from all threads before the function returns.</p>
 <h1><a class="anchor" id="autotoc_md4"></a>
 Building projects</h1>
 <h2><a class="anchor" id="autotoc_md5"></a>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['name_0',['Origin of the name',['../index.html#autotoc_md8',1,'']]]
+  ['jiwoo_0',['jiwoo',['../namespacejiwoo.html',1,'']]],
+  ['jiwoo_2ehpp_1',['jiwoo.hpp',['../jiwoo_8hpp.html',1,'']]]
 ];

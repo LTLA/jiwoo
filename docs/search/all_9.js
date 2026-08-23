@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['quick_20start_0',['Quick start',['../index.html#autotoc_md2',1,'']]]
+  ['name_0',['Origin of the name',['../index.html#autotoc_md8',1,'']]]
 ];

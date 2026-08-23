@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['transfer_0',['transfer',['../namespacejiwoo.html#af906475cab6c5a715278963ec4ef7584',1,'jiwoo']]]
+  ['get_0',['get',['../classjiwoo_1_1EquilengthArrays.html#a5359e7c9f8d0ab99af998bbf2599ce98',1,'jiwoo::EquilengthArrays::get()'],['../classjiwoo_1_1EquilengthArrays.html#aeb01767b0fb13776031c02227cd497ee',1,'jiwoo::EquilengthArrays::get() const']]]
 ];
