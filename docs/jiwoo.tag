@@ -96,6 +96,13 @@
       <arglist>() const</arglist>
     </member>
     <member kind="function">
+      <type>bool</type>
+      <name>empty</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a10f2707a5118f1fc5335d18fc1c562e0</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
       <type>Value_ *</type>
       <name>operator[]</name>
       <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
@@ -123,6 +130,62 @@
       <anchor>aeb01767b0fb13776031c02227cd497ee</anchor>
       <arglist>() const</arglist>
     </member>
+    <member kind="function">
+      <type>Value_ *</type>
+      <name>front</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a1d03c99c616512689bcfe263fae3aeb0</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>const Value_ *</type>
+      <name>front</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a81e13053c80202b9dcd4f1b5c58c8f3f</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Value_ *</type>
+      <name>back</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>aaec9047c8b9a5d0383443994b4d9da68</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>const Value_ *</type>
+      <name>back</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a1a6917460bc6f40ce5b84b69f9ed0e36</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Value_ *const *</type>
+      <name>begin</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a3072823fc7833ae50d323715a0a06c86</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>const Value_ *const *</type>
+      <name>begin</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a71eba7a10f867b960711d1c226ee6502</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Value_ *const *</type>
+      <name>end</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a7b3616a4cc3f59a8940985a491868505</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>const Value_ *const *</type>
+      <name>end</name>
+      <anchorfile>classjiwoo_1_1EquilengthArrays.html</anchorfile>
+      <anchor>a59498ad3742a8b70d805a088c2be786b</anchor>
+      <arglist>() const</arglist>
+    </member>
   </compound>
   <compound kind="namespace">
     <name>jiwoo</name>
@@ -131,8 +194,8 @@
   </compound>
   <compound kind="page">
     <name>index</name>
-    <title>Automatic memory management of containers of array pointers</title>
+    <title>Automatic memory management of array pointers</title>
     <filename>index.html</filename>
-    <docanchor file="index.html" title="Automatic memory management of containers of array pointers">md__2github_2workspace_2README</docanchor>
+    <docanchor file="index.html" title="Automatic memory management of array pointers">md__2github_2workspace_2README</docanchor>
   </compound>
 </tagfile>

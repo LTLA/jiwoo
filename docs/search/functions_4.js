@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['size_0',['size',['../classjiwoo_1_1EquilengthArrays.html#aa0c70f3563fb06931de43b4d9710057c',1,'jiwoo::EquilengthArrays']]],
-  ['swap_1',['swap',['../classjiwoo_1_1EquilengthArrays.html#ad9c70aed8c6f4886d9ad81a9d26ae762',1,'jiwoo::EquilengthArrays']]]
+  ['length_0',['length',['../classjiwoo_1_1EquilengthArrays.html#a55ca331b88bfab6b12ee355cea89e545',1,'jiwoo::EquilengthArrays']]]
 ];

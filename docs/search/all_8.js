@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['management_20of_20containers_20of_20array_20pointers_0',['Automatic memory management of containers of array pointers',['../index.html',1,'']]],
+  ['management_20of_20array_20pointers_0',['Automatic memory management of array pointers',['../index.html',1,'']]],
   ['manual_1',['Manual',['../index.html#autotoc_md7',1,'']]],
-  ['memory_20management_20of_20containers_20of_20array_20pointers_2',['Automatic memory management of containers of array pointers',['../index.html',1,'']]]
+  ['memory_20management_20of_20array_20pointers_2',['Automatic memory management of array pointers',['../index.html',1,'']]]
 ];

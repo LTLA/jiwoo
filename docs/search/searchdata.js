@@ -4,8 +4,8 @@ var indexSectionsWithContent =
   1: "e",
   2: "j",
   3: "ej",
-  4: "eglos~",
-  5: "acmop"
+  4: "befglos~",
+  5: "amop"
 };
 
 var indexSectionNames =
