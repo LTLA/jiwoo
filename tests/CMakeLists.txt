@@ -24,7 +24,7 @@ endif()
 
 add_executable(
     libtest
-    src/jiwoo.cpp
+    src/EquilengthArrays.cpp
 )
 
 target_link_libraries(
