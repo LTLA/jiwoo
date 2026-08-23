@@ -1,4 +1,4 @@
-# Automatic memory management of containers of array pointers
+# Automatic memory management of array pointers
 
 ![Unit tests](https://github.com/LTLA/jiwoo/actions/workflows/run-tests.yaml/badge.svg)
 ![Documentation](https://github.com/LTLA/jiwoo/actions/workflows/doxygenate.yaml/badge.svg)
@@ -12,57 +12,18 @@ This is more involved than one might expect when we try to squeeze out some more
 
 ## Quick start
 
-The `Scope` class will automatically free any non-`NULL` array pointers inside its bound object when it is itself destroyed: 
+The `EquilengthArrays` class is an array of equilength arrays of the specified value type.
+When destoyred, all of the arrays are automatically freed.
 
 ```cpp
-{
-    std::vector<double*> ptrs;
-    jiwoo::Scope scope(ptrs); // bind Scope to 'ptrs'
+#include "jiwoo/jiwoo.hpp"
 
-    ptrs.push_back(new double[123]);
-    ptrs.push_back(new double[32]);
-    ptrs.push_back(NULL); // ignored
-
-    // Scope will find all allocated array pointers and delete[] them.
-}
-```
-
-This works for any pointers that are stored in any nested combinations of `std::vector` and `std::optional`:
-
-```cpp
-{
-    std::optional<std::vector<std::optional<std::vector<double*> > > ptrs;
-    jiwoo::Scope scope(ptrs);
-
-    ptrs.emplace(2);
-    ptrs->back().emplace(5);
-    ptrs->back()->front() = new double [59];
-
-    // Again, Scope will find the pointer and delete[] it. 
-}
-```
-
-Sometimes it is necessary to transfer pointers between containers bound to different `Scope` instances:
-
-```cpp
-{
-    std::vector<std::optional<std::vector<double*> > > outer_ptrs(1);
-    jiwoo::Scope outer_scope(outer_ptrs);
-
-    {
-        std::optional<std::vector<double*> > inner_ptrs;
-        jiwoo::Scope inner_scope(inner_ptrs);
-
-        inner_ptrs.emplace(2);
-        inner_ptrs->front() = new double [59];
-
-        // Newly allocated pointer will not be deleted here...
-        jiwoo::transfer(inner_ptrs, outer_ptrs[0]);
-    }
-
-    // But instead be transfered into outer_ptrs, where it will
-    // eventually be deleted here.
-}
+// 13 arrays of 20 doubles.
+jiwoo::EquilengthArrays<double> arr(13, 20);
+double* first = arr[0];
+double* last = arr[19];
+double* const* ptr = arr.get();
+ptr[0][1] = 14;
 ```
 
 Check out the [reference documentation](https://ltla.github.io/jiwoo) for more details.
@@ -85,37 +46,31 @@ void compute_statistic(
     const std::size_t output_length,
     std::vector<double*>& output_buffers // pointers to arrays of 'output_length'
 ) {
-    std::optional<std::vector<std::optional<std::vector<double*> > > > partial_output;
-    jiwoo::Scope outer_scope(partial_output);
+    const std::size_t num_output = output_buffers.size();
+    std::optional<std::vector<std::optional<jiwoo::EquilengthArrays<double> > > > partial_output;
     if (num_threads > 1) {
         partial_output.emplace(num_threads - 1);
     }
-
-    const std::size_t num_output = output_buffers.size();
 
     // Check out https://github.com/LTLA/subpar for parallelization details.
     subpar::parallelize_simple(
         num_threads,
         [&](const int thread) -> void {
-            std::optional<std::vector<double*> > tmp_output;
-            jiwoo::Scope inner_scope(tmp_output);
+            std::optional<jiwoo::EquilengthArrays<double> > tmp_output;
 
-            std::vector<double*>* outptrs;
+            double* const* outptrs;
             if (thread == 0) {
-                outptrs = &output_buffers;
+                outptrs = output_buffers.data();
             } else {
-                tmp_output.emplace(num_output);
-                for (auto& ptr : *tmp_output) {
-                    ptr = new double[output_length];
-                }
-                outptrs = &(*tmp_output);
+                tmp_output.emplace(num_output, output_length);
+                outptrs = tmp_output->get();
             }
 
             // Here we compute some kind of statistic within each thread,
-            // storing the result in the arrays referenced by entries of '*outptrs'. 
+            // storing the result in the arrays referenced by entries of 'outptrs'. 
 
             if (thread > 0) {
-                jiwoo::transfer(tmp_output, partial_output[thread - 1]);
+                partial_output[thread - 1] = std::move(tmp_output);
             }
         }
     );
@@ -141,16 +96,10 @@ The use of **jiwoo** here is motivated by several considerations:
    This optimization avoids an unnecessary allocation of temporary output buffers, particularly during serial execution.
 2. Normally, if we wanted to allocate temporary output buffers, we would create a `std::vector<std::vector<double> >` that automatically manages the memory. 
    However, if we want to easily switch between `output_buffers` and our temporary buffers in different threads,
-   our temporary output buffers must also be represented as a `std::vector<double*>`.
-3. It would be slightly inefficient to allocate both a `std::vector<std::vector<double> >` and also a `std::vector<double*>` with pointers to each vector's data.
-   So, we create a `std::vector<double*>` only, and fill it with pointers to arrays allocated with `new[]`.
-   This is directly interchangeable with `output_buffers` but requires **jiwoo** to correctly free the arrays at the end of the function.
-
-Specifically, we use two sets of `jiwoo::Scope` instances here.
-The `inner_scope` is created inside each thread and ensures that there is no memory leak if the thread throws an exception.
-On success, each thread's vector of pointers is transferred (via `jiwoo::transfer()`) to a `partial_output` container outside of the thread's scope.
-This allows the function to combine the results from each thread to the final output value in the serial section.
-`partial_output` is under the control of a function-wide `outer_scope`, which frees all arrays from all threads before the function returns.
+   our temporary output buffers must also be represented as a contiguous array of `double*` pointers.
+   It would be slightly inefficient to allocate both a `std::vector<std::vector<double> >` and also a `std::vector<double*>` with pointers to each vector's data.
+3. So, we create a `jiwoo::EquilengthArrays` and extract the pointer to the internal array of pointers with the `get()` method.
+   This is directly interchangeable with the equivalent pointer from `output_buffers`. 
 
 ## Building projects 
 
