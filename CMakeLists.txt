@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(
     jiwoo
-    VERSION 0.1.0
+    VERSION 0.1.1
     DESCRIPTION "Automatic memory management of containers of array pointers"
     LANGUAGES CXX
 )
