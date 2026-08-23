@@ -10,6 +10,7 @@ TEST(EquilengthArrays, DefaultConstructor) {
     EXPECT_EQ(basic.size(), 0);
     EXPECT_EQ(basic.length(), 0);
     EXPECT_TRUE(basic.get() == NULL);
+    EXPECT_TRUE(basic.empty());
 }
 
 TEST(EquilengthArrays, NonFillConstructor) {
@@ -17,19 +18,49 @@ TEST(EquilengthArrays, NonFillConstructor) {
     EXPECT_EQ(basic.size(), 15);
     EXPECT_EQ(basic.length(), 20);
     EXPECT_TRUE(basic.get() != NULL);
+    EXPECT_FALSE(basic.empty());
+}
+
+TEST(EquilengthArrays, Methods) {
+    jiwoo::EquilengthArrays<double> basic(15, 20);
 
     EXPECT_TRUE(basic[0] != NULL);
     EXPECT_TRUE(basic[14] != NULL);
+
+    // We can set things.
     basic[0][0] = 1;
     basic[14][19] = 100;
     EXPECT_EQ(basic[0][0], 1);
     EXPECT_EQ(basic[14][19], 100);
+
+    basic.front()[1] = 2;
+    basic.back()[18] = 200;
+    EXPECT_EQ(basic.front()[1], 2);
+    EXPECT_EQ(basic.back()[18], 200);
+
+    // Loop iteration works as expected.
+    for (auto ptr : basic) {
+        ptr[5] = 5;
+    }
+    for (auto ptr : basic) {
+        EXPECT_EQ(ptr[5], 5);
+    }
 
     // Constant overloads work as well.
     const auto& conbasic = basic;
     EXPECT_TRUE(conbasic.get() != NULL);
     EXPECT_TRUE(conbasic[0] != NULL);
     EXPECT_TRUE(conbasic[14] != NULL);
+
+    EXPECT_EQ(conbasic.front()[0], 1);
+    EXPECT_EQ(conbasic.back()[19], 100);
+
+    EXPECT_EQ(conbasic[0][1], 2);
+    EXPECT_EQ(conbasic[14][18], 200);
+
+    for (auto ptr : conbasic) {
+        EXPECT_EQ(ptr[5], 5);
+    }
 }
 
 TEST(EquilengthArrays, FillingConstructor) {

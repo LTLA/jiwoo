@@ -196,6 +196,13 @@ public:
     }
 
     /**
+     * @return Whether this object is empty, i.e., no inner arrays.
+     */
+    bool empty() const {
+        return my_size == 0;
+    }
+public:
+    /**
      * @param i Index of the inner array.
      * This should be non-negative and less than `size()`.
      * @return Pointer to the start of the `i`-th inner array.
@@ -213,6 +220,7 @@ public:
         return my_ptr[i];
     }
 
+public:
     /**
      * @return Pointer to the start of the array of pointers to all inner arrays.
      */
@@ -225,6 +233,78 @@ public:
      */
     const Value_* const * get() const {
         return my_ptr;
+    }
+
+public:
+    /**
+     * @return Pointer to the start of the first array.
+     *
+     * This method is only valid if `size()` is positive.
+     */
+    Value_* front() {
+        return my_ptr[0];
+    }
+
+    /**
+     * @return Pointer to the start of the first array.
+     *
+     * This method is only valid if `size()` is positive.
+     */
+    const Value_* front() const {
+        return my_ptr[0];
+    }
+
+public:
+    /**
+     * @return Pointer to the start of the last array.
+     *
+     * This method is only valid if `size()` is positive.
+     */
+    Value_* back() {
+        return my_ptr[my_size - 1];
+    }
+
+    /**
+     * @return Pointer to the start of the last array.
+     *
+     * This method is only valid if `size()` is positive.
+     */
+    const Value_* back() const {
+        return my_ptr[my_size - 1];
+    }
+
+public:
+    /**
+     * @return Pointer to the start of the array of arrays.
+     * If `size() > 0`, deferencing this pointer is equivalent to `front()`.
+     */
+    Value_* const* begin() {
+        return my_ptr;
+    }
+
+    /**
+     * @return Pointer to the start of the array of arrays.
+     * If `size() > 0`, deferencing this pointer is equivalent to `front()`.
+     */
+    const Value_* const* begin() const {
+        return my_ptr;
+    }
+
+public:
+    /**
+     * @return Pointer to the end of the array of arrays.
+     * The difference between this and `begin()` is equal to `size()`.
+     */
+    Value_* const* end() {
+        return my_ptr + my_size;
+    }
+
+    /**
+     * @return Pointer to the end of the array of arrays.
+     * The difference between this and `begin()` is equal to `size()`.
+     */
+    const Value_* const* end() const {
+        return my_ptr + my_size;
     }
 };
 
